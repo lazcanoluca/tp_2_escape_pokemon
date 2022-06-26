@@ -1,0 +1,9 @@
+habitacion;Una habitación de la que no podes escapar;false
+mesa;Una mesa antigua con un cajón;false
+interruptor;Un interruptor de luz;false
+pokebola;Una poquebola roja y blanca;true
+cajon;Un cajón con una cerradura;false
+cajon-abierto;El cajón de la mesa está abierto;false
+llave;Llave con forma de pikachu;true
+anillo;Un anillo plateado;true
+puerta;La puerta de salida;false

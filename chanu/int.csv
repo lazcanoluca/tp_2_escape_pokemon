@@ -1,0 +1,9 @@
+pokebola;abrir;_;d:anillo:hay un anillo dentro de la pokebola
+mesa;examinar;_;d:pokebola:Notas que hay una pokebola sobre la mesa
+mesa;examinar;_;d:cajon:La mesa tiene un cajón
+habitacion;examinar;_;d:mesa:Hay una mesa en el medio de la habitación
+habitacion;examinar;_;d:interruptor:Hay un interruptor en la pared
+llave;usar;cajon;r:cajon-abierto:El cajon se abre
+llave;usar;cajon;e:llave:La llave se rompe
+cajon;abrir;_;m:_:El cajón está cerrado con llave
+cajon-abierto;examinar;_;d:coso:Hay un coso adentro del cajon
