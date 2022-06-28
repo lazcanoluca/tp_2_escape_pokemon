@@ -6,15 +6,18 @@
 
 struct accion *accion_crear_desde_string( struct accion *acc, const char *string )
 {
-	if (string == NULL) return NULL;
+	if (string == NULL)
+		return NULL;
 
 	char tipo;
 
 	int parametros_leidos = sscanf(string, "%c:%[^:]:%[^\n]\n", &tipo, acc->objeto, acc->mensaje);
 
-	if (parametros_leidos != 3) return NULL;
+	if (parametros_leidos != 3)
+		return NULL;
 
-	if (!strcmp(acc->objeto, "_")) strcpy(acc->objeto, "");
+	if (!strcmp(acc->objeto, "_"))
+		strcpy(acc->objeto, "");
 
 	switch (tipo) {
 		case 'd':
@@ -28,6 +31,9 @@ struct accion *accion_crear_desde_string( struct accion *acc, const char *string
 			break;
 		case 'm':
 			acc->tipo = MOSTRAR_MENSAJE;
+			break;
+		case 'g':
+			acc->tipo = ESCAPAR;
 			break;
 		default:
 			acc->tipo = ACCION_INVALIDA;

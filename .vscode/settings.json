@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "estructuras.h": "c"
+        "*.txt": "csv (colon)",
+        "estructuras.h": "c",
+        "interaccion.h": "c",
+        "objeto.h": "c"
     }
 }
