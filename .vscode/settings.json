@@ -5,6 +5,8 @@
         "interaccion.h": "c",
         "objeto.h": "c",
         "lista.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "string.h": "c",
+        "sala.h": "c"
     }
 }

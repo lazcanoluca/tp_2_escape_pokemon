@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../lib/tda_lista/lista.h"
-// #include "lista.h"
+// #include "../lib/tda_lista/lista.h"
+#include "lista.h"
 
 #define MAX_LINEA 1024
 #define ERROR -1
