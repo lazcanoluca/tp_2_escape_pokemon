@@ -19,5 +19,9 @@ pruebas : $(OBJ_PRUEBAS)
 valgrind-pruebas : pruebas
 	valgrind $(VALGRIND_FLAGS) ./pruebas
 
+game_engine : game_engine.c
+	$(CC) controlador.o game_engine.c -o game_engine
+	./game_engine
+
 clean:
 	rm -f escape_pokemon pruebas *.o
