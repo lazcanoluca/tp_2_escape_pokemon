@@ -4,6 +4,30 @@
 
 #include <string.h>
 
+void imprimir_pokebola()
+{
+		puts(" \
+				────────▄███████████▄────────\n \
+				─────▄███▓▓▓▓▓▓▓▓▓▓▓███▄─────\n \
+				────███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███────\n \
+				───██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██───\n \
+				──██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██──\n \
+				─██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██─\n \
+				██▓▓▓▓▓▓▓▓▓███████▓▓▓▓▓▓▓▓▓██\n \
+				██▓▓▓▓▓▓▓▓██░░░░░██▓▓▓▓▓▓▓▓██\n \
+				██▓▓▓▓▓▓▓██░░███░░██▓▓▓▓▓▓▓██\n \
+				███████████░░███░░███████████\n \
+				██░░░░░░░██░░███░░██░░░░░░░██\n \
+				██░░░░░░░░██░░░░░██░░░░░░░░██\n \
+				██░░░░░░░░░███████░░░░░░░░░██\n \
+				─██░░░░░░░░░░░░░░░░░░░░░░░██─\n \
+				──██░░░░░░░░░░░░░░░░░░░░░██──\n \
+				───██░░░░░░░░░░░░░░░░░░░██───\n \
+				────███░░░░░░░░░░░░░░░███────\n \
+				─────▀███░░░░░░░░░░░███▀─────\n \
+				────────▀███████████▀────────\n");
+}
+
 void mostrar_mensaje(const char *mensaje, enum tipo_accion accion, void *aux)
 {
 	printf("%s", mensaje);
@@ -67,24 +91,19 @@ int main(int argc, char *argv[])
 			printf("\nPodes realizar las siguientes acciones seguidas de los objetos de la sala:\n\tExaminar\n\tUsar\n\tAbrir\n\tSalir\n");
 		}
 		else if(!strcmp(comando, "agarrar")){
-			sala_agarrar_objeto(sala, objeto1);
+			sala_agarrar_objeto(sala, objeto1);				
 		}
 		else if(!strcmp(comando, "describir")){
-			sala_describir_objeto(sala, objeto1);
+			char *descripcion = sala_describir_objeto(sala, objeto1);
+			if (!!descripcion)
+				printf("%s\n", descripcion);
+				
 		}
 		else if(!strcmp(comando, "salir") && strcmp(objeto1, "") == 0){
 			condicion_salida = true;
 		}
 		else if(strcmp(comando, "") != 0 && strcmp(objeto1, "") != 0){
 			sala_ejecutar_interaccion(sala, comando, objeto1, objeto2, mostrar_mensaje, NULL);
-		}
-		
-		if (sala_es_interaccion_valida(sala, "abrir", "pokebola", "")) {
-			printf("si");
-		}
-
-		if (sala_es_interaccion_valida(sala, "salir", "puerta-abierta", "")) {
-			printf("si");
 		}
 		
 		if(sala_escape_exitoso(sala)){

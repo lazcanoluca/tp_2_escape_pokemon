@@ -3,6 +3,8 @@
         "*.txt": "csv (colon)",
         "estructuras.h": "c",
         "interaccion.h": "c",
-        "objeto.h": "c"
+        "objeto.h": "c",
+        "lista.h": "c",
+        "stdbool.h": "c"
     }
 }

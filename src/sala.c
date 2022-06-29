@@ -2,10 +2,13 @@
 #include "sala.h"
 #include "objeto.h"
 #include "interaccion.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "lista.h"
+
+#include "../lib/tda_lista/lista.h"
+// #include "lista.h"
 
 #define MAX_LINEA 1024
 #define ERROR -1
@@ -36,7 +39,9 @@ lista_t *lista_quitar_elemento(lista_t *lista, int (*comparador)(void *, void *)
 
 	for (size_t i = 0; i < lista_tamanio(lista); i++) {
 		if (comparador(lista_elemento_en_posicion(lista, i), contexto) == 0) {
-			lista_quitar_de_posicion(lista, i);
+			struct objeto *quitado = (struct objeto *)lista_quitar_de_posicion(lista, i);
+			if (!quitado)
+				free(quitado);
 		}
 	}
 
@@ -63,9 +68,9 @@ bool agregar_objeto_conocido(sala_t *sala, const char *nombre_objeto)
 
 void eliminar_objeto(sala_t *sala, const char *nombre_objeto)
 {
-	lista_quitar_elemento(sala->objetos, comparador, (void *)nombre_objeto);
-	lista_quitar_elemento(sala->obj_conocidos, comparador, (void *)nombre_objeto);
 	lista_quitar_elemento(sala->obj_poseidos, comparador, (void *)nombre_objeto);
+	lista_quitar_elemento(sala->obj_conocidos, comparador, (void *)nombre_objeto);
+	lista_quitar_elemento(sala->objetos, comparador, (void *)nombre_objeto);
 
 }
 
@@ -278,9 +283,6 @@ bool interactuar(sala_t *sala, struct interaccion *interaccion, const char *verb
 			printf("\n\nentró a descubrir objeto\n\n");
 			if (agregar_objeto_conocido(sala, interaccion->accion.objeto)) {
 				mostrar_mensaje(interaccion->accion.mensaje, interaccion->accion.tipo, aux);
-			} else {
-				mostrar_mensaje(MSJ_OBJETO_YA_CONOCIDO, interaccion->accion.tipo, aux);
-				
 			}
 			break;
 
@@ -332,6 +334,11 @@ int sala_ejecutar_interaccion(sala_t *sala,
 				void (*mostrar_mensaje)(const char *mensaje, enum tipo_accion accion, void *aux),
 				void *aux)
 {
+	if ( !lista_buscar_elemento(sala->obj_conocidos, comparador, (void *)objeto1) && !lista_buscar_elemento(sala->obj_poseidos, comparador, (void *)objeto1) ) {
+		printf("No conoces o no tenes el objeto\n");
+		return 0;
+	}
+
 	struct interaccion *interaccion;
 	int cant_interacciones = 0;
 
@@ -340,7 +347,7 @@ int sala_ejecutar_interaccion(sala_t *sala,
 		interaccion = (struct interaccion *)lista_elemento_en_posicion(sala->interacciones, i);
 
 		if ( strcmp(interaccion->verbo, verbo) == 0 && interaccion_valida(interaccion, verbo, objeto1, objeto2) ) {
-			printf("\nentró\n\n");
+			printf("\nentró\n");
 			interactuar(sala, interaccion, verbo, objeto1, objeto2, mostrar_mensaje, aux);
 			cant_interacciones++;
 		}
@@ -399,7 +406,7 @@ void sala_destruir(sala_t *sala)
 {
 	lista_destruir_todo(sala->objetos, free);
 	lista_destruir_todo(sala->interacciones, free);
-	lista_destruir_todo(sala->obj_conocidos, NULL);
-	lista_destruir_todo(sala->obj_poseidos, NULL);
+	lista_destruir(sala->obj_conocidos);
+	lista_destruir(sala->obj_poseidos);
 	free(sala);
 }

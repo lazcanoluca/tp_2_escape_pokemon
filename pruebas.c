@@ -3,7 +3,7 @@
 #include "src/sala.h"
 #include "src/objeto.h"
 #include "src/interaccion.h"
-#include "src/lista.h"
+#include "lib/tda_lista/lista.h"
 
 #include "string.h"
 #include <stdbool.h>
