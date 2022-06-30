@@ -10,6 +10,8 @@
 #define DOOR_VERTICAL '|'
 #define DOOR_HORIZONTAL '_'
 
+#define MAX_INPUT 100
+
 #define SALA_1
 #define WIDTH_SALA_1 60
 #define HEIGHT_SALA_1 30
@@ -134,7 +136,7 @@
 #define CANT_OPCIONES_MENU 3
 
 #define PLAYER_MOVE 0
-#define INTERFACE 1
+#define INTERFACE 2
 
 #define MENU_BROWSE 0
 #define EXIT 1
@@ -366,6 +368,9 @@ int GameScreenInputHandler(int ch)
                 // PlayerMove(game_screen.scenario, &player, ch);
                 return PLAYER_MOVE;
         }
+	else if (ch == '.') {
+		return INTERFACE;
+	}
         // else if (ch ==)
         
         // wrefresh(game_screen.scenario);
@@ -634,6 +639,52 @@ void MainMenuUpdate(WINDOW *window, MainMenu *menu, int ch)
         }
 }
 
+#pragma region INTERFACE
+
+void InterfaceScroll(WINDOW *console, int rows);
+
+void InterfacePut(WINDOW *console, char *string);
+
+void InterfaceGet(WINDOW *console)
+{
+
+	char str[MAX_INPUT];
+
+	int consoleY = window_height(console) - 2;
+	int consoleX = console_width() - INTERFACE_WIDTH + 4;
+
+	wattron(console, GREEN_ON_WHITE);
+	mvwprintw(console, consoleY, 1, "                                 ");
+	mvwprintw(console, consoleY, 2, "> ");
+	wattroff(console, GREEN_ON_WHITE);
+	
+	move(consoleY, consoleX);
+	wrefresh(console);
+	refresh();
+
+
+	echo();
+	// nocbreak();
+	getstr(str);
+
+	// cbreak();
+	noecho();
+
+
+	mvwprintw(console, consoleY-2, 2, "> ");
+	mvwprintw(console, consoleY-2, 4, str);
+
+	wattron(console, GREEN_ON_WHITE);
+	mvwprintw(console, consoleY, 1, "                                 ");
+	mvwprintw(console, consoleY, 2, "> ");
+	move(consoleY, consoleX);
+
+	wrefresh(console);
+	refresh();
+}
+
+#pragma endregion
+
 #pragma region ROOM
 
 // Room RoomCreate(FILE *file, int width, int height)
@@ -720,6 +771,9 @@ int main(int argc, char const *argv[])
                         PlayerMove(game_screen.scenario, &player, ch);
 		} else if (input == EXIT) {
 			exit = true;
+		} else if (input == INTERFACE) {
+			InterfaceGet(game_screen.interface);
+			// exit = false;
 		}
 		
 		// if (ch == 'l')
