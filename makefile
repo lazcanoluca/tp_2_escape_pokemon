@@ -1,4 +1,4 @@
-VALGRIND_FLAGS = --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2
+VALGRIND_FLAGS = -s --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2
 CFLAGS = -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
 CC = gcc
 FILES_EJ = ejemplo/objetos.txt ejemplo/interacciones.txt
