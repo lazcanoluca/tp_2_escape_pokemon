@@ -1,0 +1,5 @@
+habitacion;Una habitación de la que no podes escapar;false
+pokebola;Una poquebola roja y blanca;true
+llave;Llave con forma de pikachu;true
+puerta;La puerta de salida;false
+puerta-abierta;La puerta está abierta, podes salir;false
