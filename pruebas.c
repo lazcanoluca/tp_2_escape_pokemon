@@ -20,24 +20,8 @@ struct sala {
 
 void pruebas_crear_sala_l()
 {
-// 	habitacion;examinar;_;d:pokebola:Hay una pokebola en el piso
-// 	habitacion;examinar;_;d:puerta:Hay una puerta vieja
-// 	puerta;abrir;_;m:_:La puerta está cerrada con llave
-// 	pokebola;abrir;_;d:llave:hay una llave dentro de la pokebola
-// 	pokebola;abrir;_;e:pokebola:No necesitas mas la pokebola
-// 	llave;abrir;puerta;r:puerta-abierta:La puerta se abre
-// 	puerta-abierta;salir;_;g:_:Ganaste, pudiste escapar
 
 	sala_t *sala = sala_crear_desde_archivos("ejemplo/objetos.txt", "ejemplo/interacciones.txt");
-
-	// int cant_objetos = 0;
-	// char **nombres = sala_obtener_nombre_objetos(sala, &cant_objetos);
-
-	// pa2m_afirmar( cant_objetos == 5, "La sala se creó con la cantidad correcta de objetos (5)." );
-
-	// for (int i = 0; i < cant_objetos; i++) {
-	// 	printf("%i: %s\n", i, nombres[i]);
-	// }
 
 	pa2m_afirmar( lista_tamanio(sala->objetos) == 5, "La sala se creó con la cantidad correcta de objetos (5)." );
 	pa2m_afirmar( lista_tamanio(sala->interacciones) == 7, "La sala se creó con la cantidad correcta de interacciones (7)." );
@@ -48,38 +32,15 @@ void pruebas_crear_sala_l()
 	pa2m_afirmar( sala_es_interaccion_valida(sala, "abrir", "llave", "puerta"), "'abrir llave puerta' es una interacción válida");
 	pa2m_afirmar( sala_es_interaccion_valida(sala, "salir", "puerta-abierta", "_"), "'salir puerta-abierta _' es una interacción válida");
 
+        sala_destruir(sala);
+}
 
-	// struct interaccion *int1;
-	// struct interaccion *int2;
-	// struct interaccion *int3;
-	// struct interaccion *int4;
-	// struct interaccion *int5;
-	// struct interaccion *int6;
-	// struct interaccion *int7;
+void pruebas_que_fallan()
+{
+        sala_t *sala = sala_crear_desde_archivos("ejemplo/objetos.txt", "ejemplo/interacciones.txt");
 
-	// pa2m_afirmar( (int1 = interaccion_crear_desde_string("habitacion;examinar;_;d:pokebola:Hay una pokebola en el piso")) != NULL, "Se creó interacción.");
-	// pa2m_afirmar( (int2 = interaccion_crear_desde_string("habitacion;examinar;_;d:puerta:Hay una puerta vieja")) != NULL, "Se creó interacción.");
-	// pa2m_afirmar( (int3 = interaccion_crear_desde_string("puerta;abrir;_;m:_:La puerta está cerrada con llave")) != NULL, "");
-	// pa2m_afirmar( (int4 = interaccion_crear_desde_string("pokebola;abrir;_;d:llave:hay una llave dentro de la pokebola")) != NULL, "Se creó interacción.");
-	// pa2m_afirmar( (int5 = interaccion_crear_desde_string("pokebola;abrir;_;e:pokebola:No necesitas mas la pokebola")) != NULL, "Se creó interacción.");
-	// pa2m_afirmar( (int6 = interaccion_crear_desde_string("llave;abrir;puerta;r:puerta-abierta:La puerta se abre")) != NULL, "Se creó interacción.");
-	// pa2m_afirmar( (int7 = interaccion_crear_desde_string("puerta-abierta;salir;_;g:_:Ganaste, pudiste escapar")) != NULL, "Se creó interacción.");
-
-	// lista_t *lista = lista_crear();
-
-	// pa2m_afirmar( lista_insertar(lista, int1) != NULL, "Se insertó la interacción a la lista." );
-	// pa2m_afirmar( lista_insertar(lista, int2) != NULL, "Se insertó la interacción a la lista." );
-	// pa2m_afirmar( lista_insertar(lista, int3) != NULL, "Se insertó la interacción a la lista." );
-	// pa2m_afirmar( lista_insertar(lista, int4) != NULL, "Se insertó la interacción a la lista." );
-	// pa2m_afirmar( lista_insertar(lista, int5) != NULL, "Se insertó la interacción a la lista." );
-	// pa2m_afirmar( lista_insertar(lista, int6) != NULL, "Se insertó la interacción a la lista." );
-	// pa2m_afirmar( lista_insertar(lista, int7) != NULL, "Se insertó la interacción a la lista." );
-
-	// pa2m_afirmar( lista_tamanio(lista) == 7, "La lista de interacciones tiene 7 elementos.");
-
-	// pa2m_afirmar( sala_es_interaccion_valida())
-
-
+        pa2m_afirmar( sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", NULL, NULL) == 2, "Examinar la habitación devuelve dos interacciones.");
+        pa2m_afirmar( lista_tamanio(sala->obj_conocidos) == 3, "La lista de conocidos tiene tres objetos.");
 
 }
 
