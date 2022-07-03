@@ -7,14 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 
-// #include "../lib/tda_lista/lista.h"
 #include "lista.h"
 
 #define MAX_LINEA 1024
 #define ERROR -1
-
-#define MSJ_OBJETO_YA_CONOCIDO "Nada nuevo, seguí buscando."
-// #define MSJ_
 
 struct sala {
 	lista_t *objetos;
@@ -24,63 +20,73 @@ struct sala {
 	bool escapada;
 };
 
+typedef struct objeto objeto_t;
+
 
 int comparador(void *elemento, void *contexto)
 {
 	struct objeto *objeto = (struct objeto *)elemento;
 	return strcmp(objeto->nombre, (const char *)contexto);
-	// return strcmp(elemento->nombre, contexto);
 }
 
-// lista_t *lista_quitar_elemento(lista_t *lista, int (*comparador)(void *, void *), void *contexto)
-// {
-// 	if (!lista || !comparador || lista_vacia(lista)){
-// 		return NULL;
-// 	}
-
-// 	for (size_t i = 0; i < lista_tamanio(lista); i++) {
-// 		struct objeto *objeto = lista_elemento_en_posicion(lista, i);
-// 		if(!objeto){
-// 			return NULL;
-// 		}
-// 		if(comparador(objeto, contexto) == 0){
-// 			objeto = lista_quitar_de_posicion(lista, i);
-// 			if(!objeto){
-// 				return NULL;
-// 			}
-// 		}
-// 	}
-
-// 	return lista;
-// }
-
-lista_t *lista_quitar_elemento(lista_t *lista, int (*comparador)(void *, void *), void *contexto, void (*funcion)(void *))
+bool es_conocido(sala_t *sala, const char *nombre_objeto)
 {
+        return !lista_buscar_elemento(sala->obj_conocidos, comparador, (void *)nombre_objeto) ? false : true;
+}
 
-	if (!lista || !comparador || lista_vacia(lista)) return NULL;
+bool es_poseido(sala_t *sala, const char *nombre_objeto)
+{
+        return !lista_buscar_elemento(sala->obj_poseidos, comparador, (void *)nombre_objeto) ? false : true;
+}
+
+objeto_t *buscar_objeto(lista_t *lista, const char *nombre_objeto)
+{
+        // if (!lista || !comparador || !nombre_objeto)
+        //         return NULL;
+        return (objeto_t *)lista_buscar_elemento(lista, comparador, (void *)nombre_objeto);
+}
+
+lista_t *lista_quitar_elemento(lista_t *lista, const char *nombre_objeto, void (*funcion)(void *))
+{
+	if (!lista || lista_vacia(lista))
+                return NULL;
 
 	for (size_t i = 0; i < lista_tamanio(lista); i++) {
-		if (comparador(lista_elemento_en_posicion(lista, i), contexto) == 0) {
+
+		if (comparador(lista_elemento_en_posicion(lista, i), (void *)nombre_objeto) == 0) {
+
 			struct objeto *quitado = (struct objeto *)lista_quitar_de_posicion(lista, i);
-			if (quitado && funcion != NULL)  // ES SI HAY QUITADO
+
+			if (quitado && funcion != NULL)
 				funcion(quitado);
 		}
+
 	}
-
-
 
 	return lista;
 }
 
+bool quitar_conocido(sala_t *sala, const char *nombre_objeto)
+{
+        return !lista_quitar_elemento(sala->obj_conocidos, nombre_objeto, NULL) ? false : true;
+}
+
+bool quitar_poseido(sala_t *sala, const char *nombre_objeto)
+{
+        return !lista_quitar_elemento(sala->obj_poseidos, nombre_objeto, NULL) ? false : true;
+}
+
+bool destruir_objeto(sala_t *sala, const char *nombre_objeto)
+{
+        return !lista_quitar_elemento(sala->objetos, nombre_objeto, free) ? false : true;
+}
+
 bool agregar_objeto_conocido(sala_t *sala, const char *nombre_objeto)
 {
-	// Si ya se descubrió el elemento.
-	if ( lista_buscar_elemento(sala->obj_conocidos, comparador, (void *)nombre_objeto) != NULL || lista_buscar_elemento(sala->obj_poseidos, comparador, (void *)nombre_objeto) != NULL) {
-		// // printf("obj ya conocido o poseido: (%s)\n", nombre_objeto);
-		return false;
-	}
+        if (es_conocido(sala, nombre_objeto) || es_poseido(sala, nombre_objeto))
+                return false;
 
-	struct objeto *objeto = (struct objeto *)lista_buscar_elemento(sala->objetos, comparador, (void *)nombre_objeto);
+        objeto_t *objeto = buscar_objeto(sala->objetos, nombre_objeto);
 
 	if (objeto != NULL) {
 		lista_insertar(sala->obj_conocidos, objeto);
@@ -92,102 +98,184 @@ bool agregar_objeto_conocido(sala_t *sala, const char *nombre_objeto)
 
 bool eliminar_objeto(sala_t *sala, const char *nombre_objeto)
 {
-	if(!sala || !nombre_objeto){
+	if(!sala || !nombre_objeto)
 		return false;
-	}
 
-	lista_t *poseidos = lista_quitar_elemento(sala->obj_poseidos, comparador, (void *)nombre_objeto, NULL);
-	lista_t *conocidos = lista_quitar_elemento(sala->obj_conocidos, comparador, (void *)nombre_objeto, NULL);
-	lista_t *objetos = lista_quitar_elemento(sala->objetos, comparador, (void *)nombre_objeto, free);
+        quitar_poseido(sala, nombre_objeto);
+        quitar_conocido(sala, nombre_objeto);
 
-	if(!poseidos || !conocidos || !objetos){
-		return false;
-	}
-
-	sala->obj_poseidos = poseidos;
-	sala->obj_conocidos = conocidos;
-	sala->objetos = objetos;
-
-	return true;
+        return destruir_objeto(sala, nombre_objeto) ? true : false;
 }
 
-// void eliminar_objeto(sala_t *sala, const char *nombre_objeto)
-// {
-// 	lista_quitar_elemento(sala->obj_poseidos, comparador, (void *)nombre_objeto);
-// 	lista_quitar_elemento(sala->obj_conocidos, comparador, (void *)nombre_objeto);
-// 	lista_quitar_elemento(sala->objetos, comparador, (void *)nombre_objeto);
-
-// }
-
-// sala_t *sala_crear()
-// {
-// 	sala_t* sala = calloc(1, sizeof(sala_t));
-// 	return sala;
-// }
-
-sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones)
+lista_t *crear_lista_objetos(const char *objetos)
 {
-	FILE *archivo_objetos = fopen( objetos, "r" );
+        char linea[MAX_LINEA];
 
-	if (archivo_objetos == NULL)
+        FILE *archivo_objetos = fopen(objetos, "r");
+
+        if (!archivo_objetos) {
                 return NULL;
+        }
 
-	FILE *archivo_interacciones = fopen( interacciones, "r" );
 
-	if (archivo_interacciones == NULL)
+        lista_t *lista_objetos = lista_crear();
+
+        if (!archivo_objetos) {
+                fclose(archivo_objetos);
                 return NULL;
+        }
 
-	char linea[MAX_LINEA];
-
-	sala_t *sala = malloc(sizeof(sala_t));
-
-	if (sala == NULL) {
-                //cerra archivos
-		free(sala);
-		return NULL;
-	}
-
-        sala->obj_conocidos = lista_crear();
-	sala->obj_poseidos = lista_crear();
-
-	lista_t *lista_objetos = lista_crear();
 
 	while ( fgets( linea, MAX_LINEA, archivo_objetos) != NULL) {
 
 		if ( !(lista_objetos = lista_insertar( lista_objetos, objeto_crear_desde_string(linea) )) ) {
-			free(sala);
+                        fclose(archivo_objetos);
 			lista_destruir(lista_objetos);
 			return NULL;
 		}
-
 	}
 
-	sala->objetos = lista_objetos;
-	
-	lista_t *lista_interacciones = lista_crear();
+        fclose(archivo_objetos);
 
+        return lista_objetos;
+
+}
+
+lista_t *crear_lista_interacciones(const char *interacciones)
+{
+        char linea[MAX_LINEA];
+
+        FILE *archivo_interacciones = fopen(interacciones, "r");
+
+	if (!archivo_interacciones) {
+                return NULL;
+        }
+
+
+        lista_t *lista_interacciones = lista_crear();
+
+        if (!lista_interacciones) {
+                fclose(archivo_interacciones);
+                return NULL;
+        }
+
+        
 	while( fgets( linea, MAX_LINEA, archivo_interacciones ) != NULL ) {
 
 		if ( !(lista_interacciones = lista_insertar( lista_interacciones, interaccion_crear_desde_string(linea) )) ) {
-			free(sala);
+                        fclose(archivo_interacciones);
 			lista_destruir(lista_interacciones);
-			lista_destruir(lista_objetos);
 			return NULL;
 		}
 	}
 
-	sala->interacciones = lista_interacciones;
+        fclose(archivo_interacciones);
 
-	fclose( archivo_objetos );
-	fclose( archivo_interacciones );
+        return lista_interacciones;
 
-	if (sala->interacciones->cantidad == 0 || sala->objetos->cantidad == 0) {
+        
+}
+
+sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones)
+{
+        if (!objetos || !interacciones)
+                return NULL;
+	// char linea[MAX_LINEA];
+
+
+	// FILE *archivo_objetos = fopen( objetos, "r" );
+
+	// if (!archivo_objetos)
+        //         return NULL;
+
+	// FILE *archivo_interacciones = fopen( interacciones, "r" );
+
+	// if (!archivo_interacciones) {
+        //         fclose(archivo_objetos);
+        //         return NULL;
+        // }
+
+
+	sala_t *sala = calloc(1, sizeof(sala_t));
+
+	if (!sala) {
+                // fclose(archivo_objetos);
+                // fclose(archivo_interacciones);
 		sala_destruir(sala);
 		return NULL;
 	}
 
+
+        sala->obj_conocidos = lista_crear();
+	sala->obj_poseidos = lista_crear();
+        
+        if (!sala->obj_conocidos || !sala->obj_poseidos) {
+                sala_destruir(sala);
+                return NULL;
+        }
+
+        // if (!sala->obj_poseidos) {
+        //         fclose(archivo_objetos);
+        //         fclose(archivo_interacciones);
+        //         lista_destruir(sala->obj_conocidos);
+        //         free(sala);
+        //         return NULL;
+        // }
+
+
+	// lista_t *lista_objetos = lista_crear();
+
+	// while ( fgets( linea, MAX_LINEA, archivo_objetos) != NULL) {
+
+	// 	if ( !(lista_objetos = lista_insertar( lista_objetos, objeto_crear_desde_string(linea) )) ) {
+	// 		free(sala);
+	// 		lista_destruir(lista_objetos);
+	// 		return NULL;
+	// 	}
+
+	// }
+
+	// sala->objetos = lista_objetos;
+
+	
+
+	// while( fgets( linea, MAX_LINEA, archivo_interacciones ) != NULL ) {
+
+	// 	if ( !(lista_interacciones = lista_insertar( lista_interacciones, interaccion_crear_desde_string(linea) )) ) {
+	// 		free(sala);
+	// 		lista_destruir(lista_interacciones);
+	// 		lista_destruir(lista_objetos);
+	// 		return NULL;
+	// 	}
+	// }
+
+	// lista_t *lista_interacciones = crear_lista_interacciones(interacciones);
+        sala->interacciones = crear_lista_interacciones(interacciones);
+        // lista_t *lista_objetos = crear_lista_objetos(objetos);
+        sala->objetos = crear_lista_objetos(objetos);
+
+        if (!sala->interacciones || !sala->objetos || lista_vacia(sala->interacciones) || lista_vacia(sala->objetos)) {
+                // lista_destruir(sala->obj_conocidos);
+                // lista_destruir(sala->obj_poseidos);
+                // lista_destruir(lista_interacciones);
+                // lista_destruir(lista_objetos);
+                sala_destruir(sala);
+                return NULL;
+        }
+
+	// sala->interacciones = lista_interacciones;
+        // sala->objetos = lista_objetos;
+
+	// fclose( archivo_objetos );
+	// fclose( archivo_interacciones );
+
+	// if (sala->interacciones->cantidad == 0 || sala->objetos->cantidad == 0) {
+	// 	sala_destruir(sala);
+	// 	return NULL;
+	// }
+
 	agregar_objeto_conocido(sala, "habitacion");
-	sala->escapada = false;
+        // sala->escapada = false;
 
 	return sala;
 }
@@ -299,7 +387,8 @@ bool sala_agarrar_objeto(sala_t *sala, const char *nombre_objeto)
 		return false;
 	}
 
-        lista_quitar_elemento(sala->obj_conocidos, comparador, objeto, NULL);
+        // lista_quitar_elemento(sala->obj_conocidos, objeto, NULL);
+        quitar_conocido(sala, nombre_objeto);
 	lista_insertar(sala->obj_poseidos, objeto);
 	// printf("Nuevo objeto adquirido: %s\n", nombre_objeto);
 	return true;
