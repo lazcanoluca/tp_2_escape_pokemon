@@ -26,10 +26,6 @@ valgrind-pruebas : pruebas
 valgrind-pruebas_chanu : pruebas_chanu
 	valgrind $(VALGRIND_FLAGS) ./pruebas_chanu
 
-game_engine : game_engine.c
-	$(CC) controlador.o game_engine.c -o game_engine
-	./game_engine
-
 juego_con_ncurses : juego_con_ncurses.c
 	$(CC) juego_con_ncurses.c -lncurses -o juego_con_ncurses
 
