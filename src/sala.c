@@ -282,7 +282,7 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 		return NULL;
 	}
 
-	agregar_objeto_conocido(sala, "habitacion");
+	agregar_objeto_conocido(sala, sala->objetos->nodo_inicio->elemento);
 
 	return sala;
 }

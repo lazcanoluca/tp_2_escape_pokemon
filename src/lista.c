@@ -1,8 +1,8 @@
 #include "lista.h"
-#include <stddef.h>
+// #include <stddef.h>
 #include <stdlib.h>
 
-#include <stdio.h>
+// #include <stdio.h>
 
 nodo_t *nodo_en_posicion(lista_t *lista, size_t posicion)
 {

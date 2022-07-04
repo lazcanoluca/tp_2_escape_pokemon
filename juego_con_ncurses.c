@@ -702,8 +702,6 @@ void InterfaceGet(WINDOW *console)
 
 #pragma endregion
 
-
-
 int main(int argc, char const *argv[])
 {
 

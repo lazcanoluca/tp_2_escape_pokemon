@@ -3,9 +3,57 @@
 #include "src/sala.h"
 #include "src/objeto.h"
 #include "src/interaccion.h"
+#include "src/lista.h"
 
 #include "string.h"
 #include <stdbool.h>
+
+struct sala {
+	lista_t *objetos;
+	lista_t *obj_conocidos;
+	lista_t *obj_poseidos;
+	lista_t *interacciones;
+	bool escapada;
+};
+
+
+
+void pruebas_crear_sala()
+{
+	sala_t *sala = sala_crear_desde_archivos("ejemplo/objetos.txt", "ejemplo/interacciones.txt");
+
+	pa2m_afirmar( lista_tamanio(sala->objetos) == 5, "La sala se creó con la cantidad correcta de objetos (5)." );
+	pa2m_afirmar( lista_tamanio(sala->interacciones) == 7, "La sala se creó con la cantidad correcta de interacciones (7)." );
+
+	pa2m_afirmar( sala_es_interaccion_valida(sala, "examinar", "habitacion", "_"), "'examinar habitacion _' es una interacción válida");
+	pa2m_afirmar( sala_es_interaccion_valida(sala, "abrir", "puerta", "_"), "'abrir puerta _' es una interacción válida");
+	pa2m_afirmar( sala_es_interaccion_valida(sala, "abrir", "pokebola", "_"), "'abrir puerta _' es una interacción válida");
+	pa2m_afirmar( sala_es_interaccion_valida(sala, "abrir", "llave", "puerta"), "'abrir llave puerta' es una interacción válida");
+	pa2m_afirmar( sala_es_interaccion_valida(sala, "salir", "puerta-abierta", "_"), "'salir puerta-abierta _' es una interacción válida");
+
+        sala_destruir(sala);
+}
+
+void pruebas_crear_objeto()
+{
+        pa2m_afirmar(!objeto_crear_desde_string(NULL), "No se puede crear un objeto de un string NULL.");
+        pa2m_afirmar(!objeto_crear_desde_string(""), "No se puede crear un objeto de un string vacío.");
+        // pa2
+}
+
+void pruebas_funcionamiento_sala()
+{
+        pa2m_afirmar("")
+}
+
+void pruebas_que_fallan()
+{
+        sala_t *sala = sala_crear_desde_archivos("ejemplo/objetos.txt", "ejemplo/interacciones.txt");
+
+        pa2m_afirmar( sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", NULL, NULL) == 2, "Examinar la habitación devuelve dos interacciones.");
+        pa2m_afirmar( lista_tamanio(sala->obj_conocidos) == 3, "La lista de conocidos tiene tres objetos.");
+
+}
 
 void pruebasCrearObjeto()
 {
@@ -86,25 +134,25 @@ void pruebasCrearInteracciones()
 	free(inter2);
 }
 
-void pruebas_crear_sala()
-{
-	pa2m_afirmar(sala_crear_desde_archivos("/ASD/ASD/", "dasD/sa2asdd") == NULL,
-		     "No puedo crear la sala a partír de archivos inexistentes");
+// void pruebas_crear_sala()
+// {
+// 	pa2m_afirmar(sala_crear_desde_archivos("/ASD/ASD/", "dasD/sa2asdd") == NULL,
+// 		     "No puedo crear la sala a partír de archivos inexistentes");
 
-	pa2m_afirmar(sala_crear_desde_archivos("", "chanu/int.csv") == NULL,
-		     "No puedo crear la sala sin objetos");
+// 	pa2m_afirmar(sala_crear_desde_archivos("", "chanu/int.csv") == NULL,
+// 		     "No puedo crear la sala sin objetos");
 
-	pa2m_afirmar(sala_crear_desde_archivos("chanu/obj.dat", "chanu/vacio.txt") == NULL,
-		     "No puedo crear la sala sin interacciones");
+// 	pa2m_afirmar(sala_crear_desde_archivos("chanu/obj.dat", "chanu/vacio.txt") == NULL,
+// 		     "No puedo crear la sala sin interacciones");
 
-	sala_t *sala = sala_crear_desde_archivos("chanu/obj.dat", "chanu/int.csv");
+// 	sala_t *sala = sala_crear_desde_archivos("chanu/obj.dat", "chanu/int.csv");
 
-	pa2m_afirmar(sala != NULL, "Puedo crear la sala a partir de archivos no vacíos");
-	pa2m_afirmar(sala->cantidad_objetos == 9, "Se leyeron 9 objetos");
-	pa2m_afirmar(sala->cantidad_interacciones == 9, "Se leyeron 9 interacciones");
+// 	pa2m_afirmar(sala != NULL, "Puedo crear la sala a partir de archivos no vacíos");
+// 	// pa2m_afirmar(sala->cantidad_objetos == 9, "Se leyeron 9 objetos");
+// 	// pa2m_afirmar(sala->cantidad_interacciones == 9, "Se leyeron 9 interacciones");
 
-	sala_destruir(sala);
-}
+// 	sala_destruir(sala);
+// }
 
 void pruebas_nombre_objetos()
 {
@@ -178,6 +226,9 @@ int main()
 
 	pa2m_nuevo_grupo("Pruebas de interacciones");
 	pruebas_interacciones();
+
+	pa2m_nuevo_grupo("Pruebas");
+	pruebas_crear_sala_l();
 
 	return pa2m_mostrar_reporte();
 }
